@@ -43,7 +43,7 @@ const showCreateProductForm = async (req, res) => {
 
 // Criar novo produto
 const createProduct = async (req, res) => {
-  const { name, description, price, categoryId, sizes, active } = req.body;
+  const { name, description, price, categoryId, sizes, active, featured } = req.body;
   const files = req.files;
 
   try {
@@ -54,7 +54,8 @@ const createProduct = async (req, res) => {
         description,
         price: parseFloat(price),
         categoryId: Number(categoryId),
-        active: active === 'on' ? true : false
+        active: active === 'on' ? true : false,
+        featured: featured === 'on' ? true : false
       }
     });
 
@@ -125,7 +126,7 @@ const showEditProductForm = async (req, res) => {
 // Atualizar produto
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, categoryId, sizes, active } = req.body;
+  const { name, description, price, categoryId, sizes, active, featured } = req.body;
   const files = req.files;
 
   try {
@@ -139,7 +140,8 @@ const updateProduct = async (req, res) => {
         category: {
           connect: { id: Number(categoryId) }
         },
-        active: active === 'on' ? true : false
+        active: active === 'on' ? true : false,
+        featured: featured === 'on' ? true : false
       }
     });
 

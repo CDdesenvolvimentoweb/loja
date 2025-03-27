@@ -34,6 +34,7 @@ model Product {
   description String    @db.Text
   price       Float
   active      Boolean   @default(true)
+  featured    Boolean   @default(false)
   images      Image[]
   sizes       Size[]
   categoryId  Int

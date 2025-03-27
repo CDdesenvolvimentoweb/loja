@@ -13,6 +13,10 @@ const getHomePage = async (req, res) => {
     
     // Buscar produtos em destaque (os mais recentes)
     const featuredProducts = await prisma.product.findMany({
+      where: {
+        active: true,
+        featured: true
+      },
       take: 8,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -56,7 +60,10 @@ const getCategoryPage = async (req, res) => {
     
     // Buscar produtos da categoria
     const products = await prisma.product.findMany({
-      where: { categoryId: Number(id) },
+      where: { 
+        categoryId: Number(id),
+        active: true
+      },
       include: {
         images: true,
         category: true
@@ -99,7 +106,7 @@ const getProductPage = async (req, res) => {
       }
     });
     
-    if (!product) {
+    if (!product || !product.active) {
       return res.redirect('/');
     }
     
@@ -107,7 +114,8 @@ const getProductPage = async (req, res) => {
     const relatedProducts = await prisma.product.findMany({
       where: { 
         categoryId: product.categoryId,
-        id: { not: product.id }
+        id: { not: product.id },
+        active: true
       },
       take: 4,
       include: {
@@ -116,7 +124,7 @@ const getProductPage = async (req, res) => {
       orderBy: { createdAt: 'desc' }
     });
     
-    res.render('shop/product', { 
+    res.render('shop/product/index', { 
       storeConfig: storeConfig || { storeName: 'Minha Loja' },
       categories,
       product,
@@ -148,9 +156,14 @@ const getSearchPage = async (req, res) => {
     // Buscar produtos que correspondem à pesquisa (sem o parâmetro mode)
     const products = await prisma.product.findMany({
       where: {
-        OR: [
-          { name: { contains: q } },
-          { description: { contains: q } }
+        AND: [
+          {
+            OR: [
+              { name: { contains: q } },
+              { description: { contains: q } }
+            ]
+          },
+          { active: true }
         ]
       },
       include: {
