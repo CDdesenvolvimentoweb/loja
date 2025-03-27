@@ -1,0 +1,321 @@
+<%- include('./layouts/header') %>
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-4">Seu Carrinho</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div id="cartItems">
+                        <!-- Aqui os itens do carrinho serão renderizados com React -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex">
+                <a href="/" class="btn btn-outline-secondary">Continuar Comprando</a>
+                <button id="clearCartBtn" class="btn btn-outline-danger ms-2">Limpar Carrinho</button>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Resumo do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <div id="orderSummary">
+                        <!-- Aqui o resumo do pedido será renderizado com React -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informações de Contato</h5>
+                </div>
+                <div class="card-body">
+                    <div id="contactForm">
+                        <!-- Aqui o formulário de contato será renderizado com React -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- React Components -->
+<script type="text/babel">
+    // Componente para item do carrinho
+    const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
+        return (
+            <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
+                <div className="flex-shrink-0 me-3">
+                    {item.imageUrl && item.imageUrl.trim() !== '' ? (
+                        <img src={item.imageUrl} alt={item.name} width="64" height="64" className="img-thumbnail" />
+                    ) : (
+                        <div className="bg-light d-flex align-items-center justify-content-center" style={{ width: '64px', height: '64px' }}>
+                            <i className="bi bi-image text-muted"></i>
+                        </div>
+                    )}
+                </div>
+                <div className="flex-grow-1">
+                    <h5 className="mb-1">{item.name}</h5>
+                    <p className="mb-1 text-muted">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                </div>
+                <div className="d-flex align-items-center">
+                    <div className="input-group input-group-sm me-3" style={{ width: '100px' }}>
+                        <button 
+                            className="btn btn-outline-secondary" 
+                            type="button"
+                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                        >
+                            <i className="bi bi-dash"></i>
+                        </button>
+                        <input 
+                            type="text" 
+                            className="form-control text-center" 
+                            value={item.quantity} 
+                            readOnly
+                        />
+                        <button 
+                            className="btn btn-outline-secondary" 
+                            type="button"
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        >
+                            <i className="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <button 
+                        className="btn btn-sm btn-outline-danger" 
+                        onClick={() => onRemove(item.id)}
+                    >
+                        <i className="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    // Componente para resumo do pedido
+    const OrderSummary = ({ items }) => {
+        const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        return (
+            <div>
+                <ul className="list-group list-group-flush mb-3">
+                    <li className="list-group-item d-flex justify-content-between">
+                        <span>Subtotal</span>
+                        <strong>R$ {total.toFixed(2).replace('.', ',')}</strong>
+                    </li>
+                    <li className="list-group-item d-flex justify-content-between">
+                        <span>Total</span>
+                        <strong className="text-primary">R$ {total.toFixed(2).replace('.', ',')}</strong>
+                    </li>
+                </ul>
+            </div>
+        );
+    };
+
+    // Componente para formulário de contato
+    const ContactForm = ({ onSubmit, items, storePhone }) => {
+        const [name, setName] = React.useState('');
+        const [phone, setPhone] = React.useState('');
+        const [notes, setNotes] = React.useState('');
+        
+        const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            
+            if (!name || !phone) {
+                alert('Por favor, preencha seu nome e telefone.');
+                return;
+            }
+            
+            // Montar a mensagem para o WhatsApp
+            let message = `Olá! Gostaria de fazer um pedido:\n\n`;
+            
+            items.forEach(item => {
+                message += `- ${item.quantity}x ${item.name} (R$ ${(item.price * item.quantity).toFixed(2)})\n`;
+            });
+            
+            message += `\nTotal: R$ ${total.toFixed(2)}\n\n`;
+            message += `Nome: ${name}\n`;
+            message += `Telefone: ${phone}\n`;
+            
+            if (notes) {
+                message += `\nObservações: ${notes}`;
+            }
+            
+            // Codificar a mensagem para URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Criar dados do pedido para salvar no banco
+            const orderData = {
+                customerName: name,
+                customerPhone: phone,
+                notes: notes,
+                items: items.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                totalAmount: total
+            };
+            
+            // Enviar para API
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Limpar carrinho
+                    clearCart();
+                    
+                    // Abrir WhatsApp
+                    const whatsappUrl = `https://wa.me/${storePhone.replace(/\D/g, '')}?text=${encodedMessage}`;
+                    window.open(whatsappUrl, '_blank');
+                    
+                    // Redirecionar para página de confirmação
+                    window.location.href = `/order-success/${data.orderId}`;
+                } else {
+                    alert('Erro ao finalizar pedido. Por favor, tente novamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao finalizar pedido. Por favor, tente novamente.');
+            });
+        };
+        
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <label htmlFor="name" className="form-label">Nome</label>
+                    <input 
+                        type="text" 
+                        className="form-control" 
+                        id="name" 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        required 
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="phone" className="form-label">Telefone / WhatsApp</label>
+                    <input 
+                        type="tel" 
+                        className="form-control" 
+                        id="phone" 
+                        value={phone} 
+                        onChange={(e) => setPhone(e.target.value)} 
+                        required 
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="notes" className="form-label">Observações (opcional)</label>
+                    <textarea 
+                        className="form-control" 
+                        id="notes" 
+                        rows="3" 
+                        value={notes} 
+                        onChange={(e) => setNotes(e.target.value)}
+                    ></textarea>
+                </div>
+                <button type="submit" className="btn btn-primary w-100 mt-2" disabled={items.length === 0}>
+                    <i className="bi bi-whatsapp me-2"></i>
+                    Finalizar Pedido via WhatsApp
+                </button>
+            </form>
+        );
+    };
+
+    // Componente principal do carrinho
+    const CartApp = () => {
+        const [cartItems, setCartItems] = React.useState([]);
+        const storePhone = "<%= storeConfig.storePhone || '' %>";
+        
+        React.useEffect(() => {
+            // Função para renderizar o carrinho (chamada por funções externas)
+            window.renderCart = () => {
+                const items = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+                setCartItems(items);
+            };
+            
+            // Carregar itens do carrinho
+            window.renderCart();
+            
+            // Configurar botão de limpar carrinho
+            const clearCartBtn = document.getElementById('clearCartBtn');
+            if (clearCartBtn) {
+                clearCartBtn.addEventListener('click', () => {
+                    if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+                        clearCart();
+                    }
+                });
+            }
+            
+            return () => {
+                // Limpar função global quando o componente for desmontado
+                delete window.renderCart;
+            };
+        }, []);
+        
+        const handleRemoveItem = (productId) => {
+            removeFromCart(productId);
+        };
+        
+        const handleUpdateQuantity = (productId, quantity) => {
+            updateCartItemQuantity(productId, quantity);
+        };
+        
+        return (
+            <React.Fragment>
+                {/* Itens do carrinho */}
+                <div id="cartItemsContent">
+                    {cartItems.length === 0 ? (
+                        <div className="alert alert-info">
+                            <i className="bi bi-cart me-2"></i>
+                            Seu carrinho está vazio. <a href="/" className="alert-link">Clique aqui</a> para ver os produtos.
+                        </div>
+                    ) : (
+                        cartItems.map(item => (
+                            <CartItem 
+                                key={item.id} 
+                                item={item} 
+                                onRemove={handleRemoveItem}
+                                onUpdateQuantity={handleUpdateQuantity}
+                            />
+                        ))
+                    )}
+                </div>
+                
+                {/* Renderizar resumo do pedido */}
+                {ReactDOM.createRoot(document.getElementById('orderSummary')).render(
+                    <OrderSummary items={cartItems} />
+                )}
+                
+                {/* Renderizar formulário de contato */}
+                {ReactDOM.createRoot(document.getElementById('contactForm')).render(
+                    <ContactForm onSubmit={() => {}} items={cartItems} storePhone={storePhone} />
+                )}
+            </React.Fragment>
+        );
+    };
+    
+    // Renderizar o aplicativo
+    ReactDOM.createRoot(document.getElementById('cartItems')).render(<CartApp />);
+</script>
+
+<%- include('./layouts/footer') %> 

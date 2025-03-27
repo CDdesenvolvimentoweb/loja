@@ -1,0 +1,92 @@
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Sobre Nós</h5>
+                    <p><%= storeConfig.storeName %> - Sua loja de roupas online.</p>
+                    <% if (storeConfig.logoUrl) { %>
+                        <img src="<%= storeConfig.logoUrl %>" alt="<%= storeConfig.storeName %>" height="50" class="mt-2">
+                    <% } %>
+                </div>
+                
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Categorias</h5>
+                    <ul class="list-unstyled">
+                        <% if (categories && categories.length > 0) { %>
+                            <% categories.forEach(category => { %>
+                                <li><a href="/category/<%= category.id %>"><%= category.name %></a></li>
+                            <% }) %>
+                        <% } else { %>
+                            <li>Sem categorias disponíveis</li>
+                        <% } %>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contato</h5>
+                    <ul class="list-unstyled">
+                        <% if (storeConfig.storePhone) { %>
+                            <li>
+                                <i class="bi bi-whatsapp me-2"></i>
+                                <a href="https://wa.me/<%= storeConfig.storePhone.replace(/\D/g, '') %>" target="_blank">
+                                    WhatsApp: <%= storeConfig.storePhone %>
+                                </a>
+                            </li>
+                        <% } %>
+                        
+                        <% if (storeConfig.storeEmail) { %>
+                            <li>
+                                <i class="bi bi-envelope me-2"></i>
+                                <a href="mailto:<%= storeConfig.storeEmail %>">
+                                    Email: <%= storeConfig.storeEmail %>
+                                </a>
+                            </li>
+                        <% } %>
+                        
+                        <% if (storeConfig.storeAddress) { %>
+                            <li>
+                                <i class="bi bi-geo-alt me-2"></i>
+                                <%= storeConfig.storeAddress %>
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-top border-light opacity-25">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; <%= new Date().getFullYear() %> <%= storeConfig.storeName %>. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="social-links">
+                        <% if (storeConfig.socialInstagram) { %>
+                            <a href="<%= storeConfig.socialInstagram %>" target="_blank" class="me-2">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                        <% } %>
+                        <% if (storeConfig.socialFacebook) { %>
+                            <a href="<%= storeConfig.socialFacebook %>" target="_blank">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- React via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Carrinho (localStorage) -->
+    <script src="/js/cart.js"></script>
+</body>
+</html> 

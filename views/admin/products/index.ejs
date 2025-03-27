@@ -1,0 +1,106 @@
+<%- include('../layouts/header') %>
+
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3">Produtos</h1>
+            <p class="text-muted">Gerencie os produtos disponíveis na loja</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="/admin/products/create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Novo Produto
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Lista de Produtos</h5>
+        </div>
+        <div class="card-body">
+            <% if (products && products.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Imagem</th>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Categoria</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% products.forEach(function(product) { %>
+                                <tr>
+                                    <td><%= product.id %></td>
+                                    <td>
+                                        <% if (product.image) { %>
+                                            <img src="/images/products/<%= product.image %>" alt="<%= product.name %>" 
+                                                width="50" height="50" class="img-thumbnail">
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">Sem imagem</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= product.name %></td>
+                                    <td>R$ <%= product.price.toFixed(2).replace('.', ',') %></td>
+                                    <td>
+                                        <% if (product.category) { %>
+                                            <%= product.category.name %>
+                                        <% } else { %>
+                                            <span class="badge bg-warning">Sem categoria</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (product.active) { %>
+                                            <span class="badge bg-success">Ativo</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Inativo</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/admin/products/edit/<%= product.id %>" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </a>
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-sm btn-danger"
+                                                onclick="confirmDelete('<%= product.id %>', '<%= product.name %>')"
+                                            >
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Nenhum produto cadastrado. 
+                    <a href="/admin/products/create" class="alert-link">Clique aqui</a> para adicionar um produto.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(id, name) {
+        if (confirm(`Tem certeza que deseja excluir o produto "${name}"?`)) {
+            // Criar um formulário dinamicamente para enviar um POST
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/products/delete/${id}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+
+<%- include('../layouts/footer') %> 

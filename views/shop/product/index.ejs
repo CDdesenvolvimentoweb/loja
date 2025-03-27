@@ -1,0 +1,83 @@
+<%- include('../layouts/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <% if (product.images && product.images.length > 0) { %>
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <% product.images.forEach((image, index) => { %>
+                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                <img src="<%= image.url %>" class="d-block w-100 rounded" alt="<%= product.name %>">
+                            </div>
+                        <% }) %>
+                    </div>
+                    <% if (product.images.length > 1) { %>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Próximo</span>
+                        </button>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="bg-light p-5 rounded text-center">
+                    <i class="bi bi-image text-secondary" style="font-size: 5rem;"></i>
+                    <p class="mt-3 text-muted">Imagem não disponível</p>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="col-md-6">
+            <h1 class="mb-3"><%= product.name %></h1>
+            <p class="text-muted mb-3"><%= product.category.name %></p>
+            <p class="h3 text-primary mb-4">R$ <%= product.price.toFixed(2).replace('.', ',') %></p>
+            
+            <div class="mb-4">
+                <h5>Descrição</h5>
+                <p><%= product.description %></p>
+            </div>
+            
+            <% if (product.sizes && product.sizes.length > 0) { %>
+                <div class="mb-4">
+                    <h5>Tamanhos Disponíveis</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <% product.sizes.forEach(size => { %>
+                            <span class="badge bg-secondary p-2"><%= size.name %></span>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+            
+            <button 
+                class="btn btn-primary btn-lg w-100" 
+                onclick="addToCartDetail('<%= product.id %>', '<%= product.name %>', <%= product.price %>', '<%= product.images && product.images.length > 0 ? product.images[0].url : '' %>')"
+            >
+                <i class="bi bi-cart-plus me-2"></i> Adicionar ao Carrinho
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addToCartDetail(id, name, price, imageUrl) {
+        const product = {
+            id: id,
+            name: name,
+            price: price,
+            quantity: 1
+        };
+        
+        // Adiciona imageUrl apenas se existir
+        if (imageUrl && imageUrl.trim() !== '') {
+            product.imageUrl = imageUrl;
+        }
+        
+        addToCart(product);
+    }
+</script>
+
+<%- include('../layouts/footer') %>

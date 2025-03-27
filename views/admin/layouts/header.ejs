@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #3b7ddd;
+            --secondary-color: #6c757d;
+        }
+        
+        /* Buscar as cores nas configurações se possível */
+        <% if (typeof settings !== 'undefined' && settings) { %>
+            :root {
+                --primary-color: <%= settings.primaryColor || '#3b7ddd' %>;
+                --secondary-color: <%= settings.secondaryColor || '#6c757d' %>;
+            }
+        <% } %>
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fb;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: #222e3c;
+            padding-top: 1rem;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 1rem 1.5rem;
+            text-align: center;
+        }
+        .sidebar-header h3 {
+            color: #e9ecef;
+            font-size: 1.5rem;
+            margin-bottom: 0;
+        }
+        .sidebar-nav {
+            padding: 0;
+        }
+        .sidebar-link {
+            padding: 0.625rem 1.5rem;
+            color: #adb5bd;
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .sidebar-link i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            color: #e9ecef;
+            background-color: rgba(255, 255, 255, 0.075);
+        }
+        .main {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+        .navbar {
+            margin-left: var(--sidebar-width);
+            height: 60px;
+            background-color: #fff;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
+        .content {
+            margin-top: 60px;
+            padding: 2rem;
+        }
+        .card {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            background-color: rgba(33, 37, 41, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            padding: 1rem 1.25rem;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+            border-color: color-mix(in srgb, var(--primary-color) 80%, black);
+        }
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            .sidebar.open {
+                margin-left: 0;
+            }
+            .main, .navbar {
+                margin-left: 0;
+            }
+            .main.pushed, .navbar.pushed {
+                margin-left: var(--sidebar-width);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Painel Admin</h3>
+        </div>
+
+        <ul class="list-unstyled sidebar-nav">
+            <li>
+                <a href="/admin/dashboard" class="sidebar-link">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/admin/categories" class="sidebar-link">
+                    <i class="bi bi-tags"></i> Categorias
+                </a>
+            </li>
+            <li>
+                <a href="/admin/products" class="sidebar-link">
+                    <i class="bi bi-box-seam"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="/admin/orders" class="sidebar-link">
+                    <i class="bi bi-bag-check"></i> Pedidos
+                </a>
+            </li>
+            <li>
+                <a href="/admin/store-config" class="sidebar-link">
+                    <i class="bi bi-gear"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="/auth/logout" class="sidebar-link">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand navbar-light sticky-top">
+        <button id="sidebarToggle" class="btn btn-link d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> <%= user.name %>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/auth/logout">Sair</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page content -->
+    <main class="main">
+        <div class="content"> 

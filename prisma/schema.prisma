@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String    @db.Text
+  price       Float
+  active      Boolean   @default(true)
+  images      Image[]
+  sizes       Size[]
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Size {
+  id        Int      @id @default(autoincrement())
+  name      String
+  productId Int
+  stock     Int      @default(0)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreConfig {
+  id               Int      @id @default(autoincrement())
+  storeName        String
+  storeDescription String?  @db.Text
+  storePhone       String?
+  storeEmail       String?
+  storeAddress     String?  @db.Text
+  socialInstagram  String?
+  socialFacebook   String?
+  primaryColor     String?
+  secondaryColor   String?
+  logoUrl          String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  customerName String?
+  customerPhone String?
+  customerEmail String?
+  orderItems   OrderItem[]
+  totalAmount  Float
+  status       String      @default("pending")
+  notes        String?     @db.Text
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  price     Float
+  size      String?
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 

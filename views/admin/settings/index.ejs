@@ -1,0 +1,178 @@
+<%- include('../layouts/header') %>
+
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3">Configurações da Loja</h1>
+            <p class="text-muted">Personalize as informações gerais da sua loja</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações Básicas</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/store-config" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="storeName" class="form-label">Nome da Loja</label>
+                                    <input type="text" class="form-control" id="storeName" name="storeName" 
+                                        value="<%= settings.storeName || '' %>" required>
+                                    <div class="form-text">Este nome será exibido no título do site e cabeçalho da loja.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="storeDescription" class="form-label">Descrição</label>
+                                    <textarea class="form-control" id="storeDescription" name="storeDescription" 
+                                        rows="3"><%= settings.storeDescription || '' %></textarea>
+                                    <div class="form-text">Uma breve descrição da sua loja para os clientes.</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="storePhone" class="form-label">Telefone/WhatsApp</label>
+                                            <input type="text" class="form-control" id="storePhone" name="storePhone" 
+                                                value="<%= settings.storePhone || '' %>">
+                                            <div class="form-text">Número para contato e pedidos via WhatsApp.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="storeEmail" class="form-label">E-mail</label>
+                                            <input type="email" class="form-control" id="storeEmail" name="storeEmail" 
+                                                value="<%= settings.storeEmail || '' %>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="storeLogo" class="form-label">Logo da Loja</label>
+                                    <input type="file" class="form-control" id="storeLogo" name="storeLogo" accept="image/*">
+                                    <div class="form-text">
+                                        Formatos aceitos: JPG, PNG. Tamanho máximo: 2MB. Recomendação: 200x200px.
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="border p-3 text-center bg-light" id="logo-preview">
+                                            <% if (settings.storeLogo) { %>
+                                                <img src="/images/store/<%= settings.storeLogo %>" class="img-fluid" style="max-height: 150px;">
+                                            <% } else { %>
+                                                <i class="bi bi-shop" style="font-size: 3rem; color: #ccc;"></i>
+                                                <p class="mb-0">Nenhuma logo definida</p>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <label for="storeAddress" class="form-label">Endereço</label>
+                            <textarea class="form-control" id="storeAddress" name="storeAddress" 
+                                rows="2"><%= settings.storeAddress || '' %></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Redes Sociais</label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text"><i class="bi bi-instagram"></i></span>
+                                        <input type="text" class="form-control" placeholder="Instagram" 
+                                            name="socialInstagram" value="<%= settings.socialInstagram || '' %>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text"><i class="bi bi-facebook"></i></span>
+                                        <input type="text" class="form-control" placeholder="Facebook" 
+                                            name="socialFacebook" value="<%= settings.socialFacebook || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <label class="form-label">Cores do Site</label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label for="primaryColor" class="form-label">Cor Principal</label>
+                                    <div class="input-group">
+                                        <input type="color" class="form-control form-control-color" id="primaryColor" 
+                                            name="primaryColor" value="<%= settings.primaryColor || '#0d6efd' %>">
+                                        <input type="text" class="form-control" value="<%= settings.primaryColor || '#0d6efd' %>" 
+                                            id="primaryColorText" oninput="document.getElementById('primaryColor').value = this.value">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="secondaryColor" class="form-label">Cor Secundária</label>
+                                    <div class="input-group">
+                                        <input type="color" class="form-control form-control-color" id="secondaryColor" 
+                                            name="secondaryColor" value="<%= settings.secondaryColor || '#6c757d' %>">
+                                        <input type="text" class="form-control" value="<%= settings.secondaryColor || '#6c757d' %>" 
+                                            id="secondaryColorText" oninput="document.getElementById('secondaryColor').value = this.value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sincronizar os inputs de cor
+    document.getElementById('primaryColor').addEventListener('input', function() {
+        document.getElementById('primaryColorText').value = this.value;
+    });
+    document.getElementById('secondaryColor').addEventListener('input', function() {
+        document.getElementById('secondaryColorText').value = this.value;
+    });
+
+    // Prévia da logo
+    document.getElementById('storeLogo').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const previewContainer = document.getElementById('logo-preview');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewContainer.innerHTML = `
+                    <img src="${e.target.result}" class="img-fluid" style="max-height: 150px;">
+                `;
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            <% if (settings.storeLogo) { %>
+                previewContainer.innerHTML = `
+                    <img src="/images/store/<%= settings.storeLogo %>" class="img-fluid" style="max-height: 150px;">
+                `;
+            <% } else { %>
+                previewContainer.innerHTML = `
+                    <i class="bi bi-shop" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="mb-0">Nenhuma logo definida</p>
+                `;
+            <% } %>
+        }
+    });
+</script>
+
+<%- include('../layouts/footer') %> 

@@ -1,0 +1,81 @@
+<%- include('../layouts/header') %>
+
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3">Editar Categoria</h1>
+            <p class="text-muted">Edite as informações da categoria #<%= category.id %></p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="/admin/categories" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações da Categoria</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/categories/edit/<%= category.id %>" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nome da Categoria</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="name" 
+                                name="name" 
+                                value="<%= category.name %>" 
+                                required
+                            >
+                            <div class="form-text">Nome da categoria exibido na loja</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Atualizar Categoria</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações Adicionais</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> <%= category.id %></p>
+                    <p><strong>Criado em:</strong> <%= new Date(category.createdAt).toLocaleDateString('pt-BR') %></p>
+                    <p><strong>Última atualização:</strong> <%= new Date(category.updatedAt).toLocaleDateString('pt-BR') %></p>
+                    <hr>
+                    <div class="d-grid">
+                        <button 
+                            type="button" 
+                            class="btn btn-danger" 
+                            onclick="confirmDelete('<%= category.id %>', '<%= category.name %>')"
+                        >
+                            <i class="bi bi-trash me-1"></i> Excluir Categoria
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(id, name) {
+        if (confirm(`Tem certeza que deseja excluir a categoria "${name}"?`)) {
+            // Criar um formulário dinamicamente para enviar um POST
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/categories/delete/${id}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+
+<%- include('../layouts/footer') %> 

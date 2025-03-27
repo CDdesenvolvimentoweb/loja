@@ -1,0 +1,147 @@
+<%- include('../layouts/header') %>
+
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3">Detalhes do Pedido #<%= order.id %></h1>
+            <p class="text-muted">Visualize e gerencie as informações deste pedido</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="/admin/orders" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Itens do Pedido</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th class="text-end">Preço Unitário</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% order.orderItems.forEach(function(item) { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <% if (item.product.image) { %>
+                                                    <img src="/images/products/<%= item.product.image %>" alt="<%= item.product.name %>" 
+                                                        width="40" height="40" class="img-thumbnail me-2">
+                                                <% } else { %>
+                                                    <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" 
+                                                        style="width: 40px; height: 40px;">
+                                                        <i class="bi bi-image text-secondary"></i>
+                                                    </div>
+                                                <% } %>
+                                                <div>
+                                                    <strong><%= item.product.name %></strong>
+                                                    <% if (item.product.categoryId && item.product.category) { %>
+                                                        <div class="text-muted small"><%= item.product.category.name %></div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><%= item.quantity %></td>
+                                        <td class="text-end">R$ <%= item.price.toFixed(2).replace('.', ',') %></td>
+                                        <td class="text-end">R$ <%= (item.price * item.quantity).toFixed(2).replace('.', ',') %></td>
+                                    </tr>
+                                <% }); %>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end"><strong>R$ <%= order.totalAmount.toFixed(2).replace('.', ',') %></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Observações do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <% if (order.notes && order.notes.trim().length > 0) { %>
+                        <p><%= order.notes %></p>
+                    <% } else { %>
+                        <p class="text-muted">Nenhuma observação para este pedido.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações do Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nome:</strong> <%= order.customerName %></p>
+                    <p><strong>Telefone:</strong> <%= order.customerPhone %></p>
+                    <p>
+                        <a href="https://wa.me/<%= order.customerPhone.replace(/\D/g, '') %>" 
+                            class="btn btn-success btn-sm w-100" target="_blank">
+                            <i class="bi bi-whatsapp me-1"></i> Contatar via WhatsApp
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Status do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Status atual:</span>
+                            <% if (order.status === 'pending') { %>
+                                <span class="badge bg-warning">Pendente</span>
+                            <% } else if (order.status === 'completed') { %>
+                                <span class="badge bg-success">Concluído</span>
+                            <% } else if (order.status === 'cancelled') { %>
+                                <span class="badge bg-danger">Cancelado</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <form action="/admin/orders/<%= order.id %>/status" method="POST">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Alterar status:</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pendente</option>
+                                <option value="completed" <%= order.status === 'completed' ? 'selected' : '' %>>Concluído</option>
+                                <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Atualizar Status</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Detalhes do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Pedido ID:</strong> <%= order.id %></p>
+                    <p><strong>Data de criação:</strong> <%= new Date(order.createdAt).toLocaleDateString('pt-BR') %> às <%= new Date(order.createdAt).toLocaleTimeString('pt-BR') %></p>
+                    <p><strong>Última atualização:</strong> <%= new Date(order.updatedAt).toLocaleDateString('pt-BR') %> às <%= new Date(order.updatedAt).toLocaleTimeString('pt-BR') %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer') %> 
