@@ -85,3 +85,7 @@ Sinta-se à vontade para contribuir com este projeto. Crie um fork, faça suas a
 ## Licença
 
 Este projeto está licenciado sob a licença MIT. 
+
+DATABASE_URL="mysql://dgadmin:@DG450159753@localhost:3306/loja_ecommerce"
+JWT_SECRET="sua_chave_secreta_jwt_muito_segura"
+PORT=3000 

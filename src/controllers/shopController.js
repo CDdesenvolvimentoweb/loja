@@ -145,12 +145,12 @@ const getSearchPage = async (req, res) => {
       orderBy: { name: 'asc' }
     });
     
-    // Buscar produtos que correspondem à pesquisa
+    // Buscar produtos que correspondem à pesquisa (sem o parâmetro mode)
     const products = await prisma.product.findMany({
       where: {
         OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { description: { contains: q, mode: 'insensitive' } }
+          { name: { contains: q } },
+          { description: { contains: q } }
         ]
       },
       include: {
@@ -160,7 +160,7 @@ const getSearchPage = async (req, res) => {
       orderBy: { createdAt: 'desc' }
     });
     
-    res.render('shop/search', { 
+    res.render('shop/search/index', { 
       storeConfig: storeConfig || { storeName: 'Minha Loja' },
       categories,
       searchQuery: q,
@@ -168,7 +168,8 @@ const getSearchPage = async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao buscar resultados da pesquisa:', error);
-    res.status(500).render('shop/error', { message: 'Erro ao carregar os resultados da pesquisa' });
+    // Redirecionar para a página inicial em caso de erro
+    return res.redirect('/');
   }
 };
 
